@@ -192,6 +192,8 @@ Choosing a Web Listener (REST Data Services)
 	  $> java -jar ords.war validate    
 
 	  *****
+	  $> cd C:\Oracle\ords
+	  $> java -jar ords.war standalone
 	  -> http://localhost:8666/ords
 
     Configuring Static File Support
