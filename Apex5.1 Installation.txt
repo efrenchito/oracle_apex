@@ -1,0 +1,161 @@
+https://docs.oracle.com/database/apex-5.1/HTMIG/downloading-installing-Oracle-AE.htm#HTMIG29147
+https://apexapps.oracle.com/pls/apex/f?p=44785:118:117368105138923::NO:RP,118:P118_COLLECTION_ID,P118_PREV_PAGE:146784,2 -> Oracle By Example
+
+Choosing a Web Listener (REST Data Services)
+    In order to run, Oracle Application Express must have access to Oracle REST Data Services, Oracle HTTP Server and mod_plsql, or the Embedded PL/SQL Gateway.
+    Oracle Application Express uses a simple architecture where pages are dynamically generated using metadata stored within the Oracle Database. There is no code generation or file based compilation. Once fully installed, a Uniform Resource Locator (URL) is defined for both developers and end users to access Oracle Application Express. Users require only a Web browser and the required URL. No additional client software is required.
+
+    The Web Listener functions as a communications broker between the Web browser and the Oracle Application Express objects in the Oracle database by mapping browser requests into database stored procedure calls. You have a choice of three Web Listeners.
+      .Oracle REST Data Services (formerly Oracle Application Express Listener). See "About Oracle REST Data Services."
+	  .Oracle HTTP Server. See "About Oracle HTTP Server with mod_plsql."
+	  .Embedded PL/SQL gateway. See "About the Embedded PL/SQL Gateway."
+
+      -> see https://docs.oracle.com/database/apex-5.1/HTMIG/choosing-web-listener.htm#GUID-47904ADC-A5FF-4591-98B1-BFB1A38E08E4  
+
+Downloading and Installing Oracle Express Edition (OEE 11g2)
+    -> DOWNLOADING OEE
+       .Access the URL -> http://www.oracle.com/technetwork/database/database-technologies/express-edition/downloads/index.html
+       .Extract the file OracleXE112_Win64.zip
+       .Run DISK1\setup	
+       .Destination Path: C:\ORACLE\ORACLE11G2XE
+
+Downloading and Installing Application Express (Apex5.1)
+	-> DOWNLOADING APEX
+	    .Extract the file apex_5.1.zip to C:\Oracle\Apex5.1
+	    
+
+    -> Create the APEX tablespace
+      -> CONNECT as SYSDBA to SQLPLUS
+		.SYSTEM_DRIVE:\ sqlplus /nolog
+		.SQL> CONNECT SYS as SYSDBA
+		.Enter password: system
+
+		$> SELECT name FROM v$datafile ;
+			C:\ORACLE\ORACLEXE11G2\APP\ORACLE\ORADATA\XE\SYSTEM.DBF
+			C:\ORACLE\ORACLEXE11G2\APP\ORACLE\ORADATA\XE\SYSAUX.DBF
+			C:\ORACLE\ORACLEXE11G2\APP\ORACLE\ORADATA\XE\UNDOTBS1.DBF
+			C:\ORACLE\ORACLEXE11G2\APP\ORACLE\ORADATA\XE\USERS.DBF
+
+		$> CREATE TABLESPACE APEX_DATA DATAFILE 'C:\ORACLE\ORACLEXE11G2\APP\ORACLE\ORADATA\XE\APEX_DATA.dbf' SIZE 10M AUTOEXTEND ON NEXT 1M;
+
+		$> SELECT name FROM v$tablespace ;
+		    SYSTEM
+			UNDOTBS1
+			SYSAUX
+			USERS
+			TEMP
+			APEX_DATA
+
+    -> Installing APEX (@apexins.sql)
+      Available installation options include:
+      .Full development environment      
+      .Runtime environment
+
+	    .Full development environment. Run apexins.sql passing the following four arguments in the order shown:
+	      $>  cd C:\Oracle\Apex5.1\apex
+	      $>  sqlplus / as sysdba
+	      $>  @apexins.sql APEX_DATA APEX_DATA TEMP /i/
+
+	    *****
+		    Thank you for installing Oracle Application Express 5.1.0.00.45
+
+			Oracle Application Express is installed in the APEX_050100 schema.
+
+			The structure of the link to the Application Express administration services is as follows:
+			http://host:port/pls/apex/apex_admin (Oracle HTTP Server with mod_plsql)
+			http://host:port/apex/apex_admin     (Oracle XML DB HTTP listener with the embedded PL/SQL gateway)
+			http://host:port/apex/apex_admin     (Oracle REST Data Services)
+
+			The structure of the link to the Application Express development interface is as follows:
+			http://host:port/pls/apex (Oracle HTTP Server with mod_plsql)
+			http://host:port/apex     (Oracle XML DB HTTP listener with the embedded PL/SQL gateway)
+			http://host:port/apex     (Oracle REST Data Services)
+		*****
+
+	    When Oracle Application Express installs, it creates three new database accounts:
+	      .APEX_050100 - The account that owns the Oracle Application Express schema and metadata.
+	      .FLOWS_FILES - The account that owns the Oracle Application Express uploaded files.
+	      .APEX_PUBLIC_USER - The minimally privileged account is used for Oracle Application Express configuration with Oracle REST Data Services or Oracle HTTP Server and mod_plsql.
+
+		If you configured RESTful Web services, then these additional accounts will be created:
+	      .APEX_REST_PUBLIC_USER - The account used when invoking RESTful Services definitions stored in Oracle Application Express.
+	      .APEX_LISTENER - The account used to query RESTful Services definitions stored in Oracle Application Express.
+	      .ORDS_METADATA - Is where the metadata about Oracle REST Data Services-enabled schemas is stored.
+	      .ORDS_PUBLIC_USER - User for invoking RESTful Services in the Oracle REST Data Services-enabled schemas.
+
+	    If you are upgrading from a previous release, then FLOWS_FILES already exists and APEX_PUBLIC_USER is created if it does not already exist.
+
+	->Creating or Updating Your Instance Administration Account (admin/Abcd#1234)
+	  Instance administrators are superusers that are responsible for managing an entire Oracle Application Express instance, including managing workspace provisioning, configuring features and instance settings, and managing security. To perform these tasks, an Instance administrator signs in to the Oracle Application Express Administration Services application.
+
+	  $> cd C:\Oracle\Apex5.1\apex
+	  $> sqlplus / as sysdba
+	  $> @apxchpwd.sql
+	    Password must contain:
+	      .(!#$%&()"*+,-/:;?_)
+	      .At least one upper-case alphabetic character
+	      .A numeric character
+
+    -> APEX_PUBLIC_USER Account
+      The APEX_PUBLIC_USER account is created with a random password in a new installation of Oracle Application Express. You must change the password for this account before configuring the database access descriptor (DAD) in a new installation.
+
+      .Unlocking and changing Password for the APEX_PUBLIC_USER|FLOWS_FILES Account (Admin#1234)
+	    $> sqlplus / as sysdba
+        $> ALTER USER APEX_PUBLIC_USER ACCOUNT UNLOCK IDENTIFIED BY Abcd#1234;
+        $> ALTER USER FLOWS_FILES      ACCOUNT UNLOCK IDENTIFIED BY Abcd#1234;
+
+Configure Embedded PL/SQL Gateway
+  Being in the location C:\Oracle\Apex5.1\apex log into SQL Plus as sysdba
+  Then run the script:
+    $> cd C:\Oracle\Apex5.1\apex
+    $> sqlplus / as sysdba
+    $> @apex_epg_config.sql C:\Oracle/Apex5.1
+
+    .Unlocking and changing Password for the APEX_PUBLIC_USER|FLOWS_FILES Account (Admin#1234)
+	    $> sqlplus / as sysdba
+        $> ALTER USER anonymous ACCOUNT UNLOCK IDENTIFIED BY Abcd#1234;
+
+    Now check the assigned port for this installation
+    .Login as SYSDBA and run:
+      $> SELECT DBMS_XDB.GETHTTPPORT FROM DUAL;
+    
+    .If the result is 0 then run the following command:
+      $> EXEC DBMS_XDB.SETHTTPPORT(8080);
+
+    Now to begin with Apex Application development you will have to create a workspace and then you can create Application in that workspace.
+
+
+Downloading and Installing Oracle REST Data Services (Standalone Mode)
+  To install Oracle REST Data Services:
+  Download, install, and configure Oracle REST Data Services. See Installing and Configuring Oracle REST Data Services.
+  Deploy Oracle REST Data Services. Deployment options include:
+	.Standalone Mode. See Running in Standalone Mode.
+	.Oracle WebLogic Server. See Deploying to Oracle WebLogic Server.
+	.GlassFish Server. See Deploying to GlassFish Server.
+	.Apache Tomcat. See Deploying to Apache Tomcat.
+
+  	-> Downloading Oracle Rest Data Services
+  	  http://www.oracle.com/technetwork/developer-tools/rest-data-services/downloads/index.html
+  	    Extract .zip
+        -> set ords_params.properties
+	      	db.hostname=
+			db.port=
+			db.servicename=
+			db.sid=
+			db.username=APEX_PUBLIC_USER
+			migrate.apex.rest=false
+			rest.services.apex.add=
+			rest.services.ords.add=true
+			schema.tablespace.default=SYSAUX
+			schema.tablespace.temp=TEMP
+			standalone.http.port=8081
+			standalone.static.images=C:\Oracle/Apex5.1/images
+			user.tablespace.default=USERS
+			user.tablespace.temp=TEMP
+
+	  $> cd C:\Oracle\ords.3.0.9.348.07.16>
+	  $> java -jar ords.war install simple
+	     -> location to store configuration: C:\Oracle\ords.3.0.9.348.07.16\config
+	     -> ORDS_PUBLIC_USER password: ordsPublicUser
+
+	  $> java -jar ords.war validate    

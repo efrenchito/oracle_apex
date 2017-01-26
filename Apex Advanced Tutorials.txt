@@ -1,0 +1,145 @@
+-> See Oracle Database Application Express User's Guide (ODAEUG).
+
+01. Loading Sample Objects
+	-> Downloading OEHR Sample Objects
+	  To import the OEHR Sample Objects application, you first need to download it from the
+	  Oracle Technology Network (OTN):
+	  1. In your Web browser go to:
+	  http://www.oracle.com/technology/products/database/application_
+	  express/packaged_apps/oehr_sample_objects.zip
+	  2. Locate the OEHR Sample Objects application.
+	  3. Download the oehr_sample_objects.zip file to your computer.
+	  4. Unzip and extract the oehr_sample_objects_installer.sql file
+
+	-> Importing and Installing OEHR Sample Objects
+	  To import and install the OEHR Sample Objects application:
+	  1. Log in to Oracle Application Express. -> See "Logging In To Oracle Application Express" in (ODAEUG).
+	  2. On the Workspace home page, click Application Builder. -> The Application Builder home page appears.
+	  3. Click the Import button.
+	  4. For Specify File, specify the following:
+	    a. Import file - Click Browse and go to the oehr_sample_objects_installer.sql file.
+	    b. File Type - Select Application, Page, or Component Export.
+	    c. Verify that File Character Set is correct.
+	    d. Click Next.
+	  
+	  Now that you have imported the file, you want to install it.
+	  5. To install an imported file, click Next. -> The Install Application Wizard appears.
+	  6. In the Install Application Wizard, specify the following:
+		a. Parse As Schema - Select a schema.
+		b. Build Status - Select Run and Build Application.
+		c. Install As Application - Select Auto Assign New Application ID.
+		d. Click Install.
+	  7. For Supporting Objects, select Yes and click Next.
+	  8. Confirm your selections by clicking Install.
+	  9. Click the Home breadcrumb link at the top of the page.
+		The Application Builder home page appears.
+
+    -> Viewing Database Objects
+      To view the objects:
+      1. On the Workspace home page, click SQL Workshop.
+      2. Click Object Browser.
+      3. From the Object Selection list, select Tables.
+	  4. In the Object Selection pane, click OEHR_EMPLOYEES from the list.
+	  The Detail pane shows details about the table.
+	  5. Click the Data tab in the row at the top of the Details pane.
+	  The data in the OEHR_EMPLOYEES table appears. Note that other tabs show additional details about the object you select.
+	  6. To search for an object name, enter a case insensitive term in the Search field.
+	  7. To view all objects, leave the Search field blank.
+
+	-> About Application Authentication
+	  As you create new pages, you can view them by running the page individually or by running an entire application. When you run a page or application, the Application Express engine dynamically renders it into viewable HTML based on data stored in the database.
+	  By default, all the applications you create in these tutorials use Application Express Authentication. Application Express Authentication is a built-in authentication scheme that uses the same internal user accounts you use to log in to a workspace.
+	  The first time you run a page in an application, you are prompted to enter a user name and password. To continue, simply enter your workspace user name and password and then click Login. When you create your own applications, you can choose from a number of preconfigured authentication schemes or build your own.
+	    -> See "Establishing User Identity Through Authentication" in (ODAEUG).
+
+
+02. How to Create a Tabular Form
+  A tabular form enables users to update multiple rows in a table at once from a single page. You can use the Tabular Form Wizard to create a tabular form that contains a built-in multiple row update process. This built-in process performs optimistic locking behind the scenes to maintain the data integrity.
+
+  This tutorial explains how to create a tabular form within a new application and then how to change one of the updatable columns from a text field to a select list.
+
+    -> Creating an Application
+      To create an application using the Create Application Wizard:
+	  1. On the Workspace home page, click the Application Builder icon.
+	  The Application Builder home page appears.
+	  2. Click Create.
+	  3. Select Create Application and click Next.
+	  4. For Name:
+	    a. Name - Enter Tabular Form.
+	    b. Application - Accept the default.
+	    c. Create Application - Select From scratch.
+	    d. Schema - Select the schema where you installed the OEHR sample objects.
+	    e. Click Next.
+	  Next, you need to add a page. You have the option of adding a blank page, a
+	  report, a form, a tabular form, or a report and form. For this exercise, you
+	  create an application containing a blank page. Then, you create a tabular form.
+	  5. Add a blank page:
+	    a. Under Select Page Type, select Blank and click Add Page
+	    The new page appears in the list at the top of the page.
+	    b. Click Next.
+	  6. For Tabs, accept the default, One Level of Tabs, and click Next.
+	  7. For Copy Shared Components from Another Application, accept the default, No, and click Next.
+	  8. For Attributes, accept the defaults for Authentication Scheme, Language, and User Language Preference Derived From and click Next.
+	  9. For User Interface, select Theme 2 and click Next.
+	  A theme is collection of templates that define the layout and style of an application. You can change a theme at any time.
+	  10. Review your selections and click Create.
+	  The Application home page appears.
+	    -> See "Managing Themes" in (ODAEUG).
+
+	-> Creating a Tabular Form Using a Wizard
+	  The Tabular Form Wizard creates a form to perform update, insert, and delete operations on multiple rows in a database table.
+
+	  To create a tabular form using the Tabular Form Wizard:
+	    1. On the Application home page, click Create Page.
+	    2. For the page type, select Form and click Next.
+	    3. Select Tabular Form and click Next.
+	    4. For Table/View Owner:
+	      a. Table/View Owner - Accept the default.
+	      b. Allowed Operations - Accept the default, Update, Insert, and Delete.
+	      c. Click Next.
+	    5. For Table/View Name, select OEHR_EMPLOYEES and click Next.
+		6. For Displayed Columns:
+		  a. For Select Columns, press Ctrl and select the following columns:
+		  FIRST_NAME, LAST_NAME, HIRE_DATE, SALARY, DEPARTMENT_ID
+		  b. Click Next.
+		7. For Primary Key, accept the default, EMPLOYEE_ID (Number) and click Next.
+		8. For Source Type, accept the default, Existing trigger, and click Next.
+		9. For Updatable Columns, select all columns and click Next.
+		10. For Page and Region Attributes:
+		  a. Page - Accept the default.
+		  b. Page Name - Enter Tabular Form.
+		  c. Region Title - Accept the default, Tabular Form.
+		  d. Region Template and Report Template - Accept the defaults.
+		  e. Breadcrumb - Accept the default.
+		  f. Click Next.
+		11. For Tab, accept the default, Do not use tabs, and click Next.
+		12. For Button Labels, specify the following:
+		  a. Submit button - Enter Apply Changes.
+		  b. Cancel, Delete, and Add Row buttons - Accept the default label text.
+		  c. Click Next.
+		13. For Branching, accept the defaults and click Next.
+		Branching tells the Web browser what page to display when the current page is submitted for processing. In this case, you want the user to remain on the current page.
+		14. Confirm your selections and click Finish.
+		Next, run the page to view your new form.
+
+    -> Changing an Updatable Column to a Select List
+      When the Tabular Form Wizard creates a tabular form, updatable columns are displayed, by default, as text fields. In the next exercise, you change the default display of the Department Id column to a select list.
+      -> See "Creating Lists of Values" in (ODAEUG).
+
+        + Create a Named List of Values
+          To create a named LOV for the Department Id:
+		  1. Click Edit Page 2 on the Developer toolbar
+		  2. Under List of Values, click the Create icon.
+		  The Create List of Values Wizard appears.
+		  3. For Source, select From Scratch and click Next.
+		  4. For Name and Type:
+		    a. Name - Enter DEPTID.
+		    b. Type - Select Dynamic.
+		    c. Click Next.
+		  5. For Query or Static Values, replace the existing text with this:
+		    SELECT DISTINCT department_id a, department_id b FROM oehr_employees
+		  6. Click Create List of Values.
+		  The Page Definition for page 2 appears. Note that the LOV does not yet appear on
+		  the Page Definitions.
+
+		+ Edit the Column to Display as a Select List
