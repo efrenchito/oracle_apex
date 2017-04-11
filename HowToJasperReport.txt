@@ -1,0 +1,122 @@
+https://www.youtube.com/watch?v=GrSBpIAgCpU
+
+Agenda
+ - Introducción
+ - Presentar el paquete jrxml2pdf desarrollado por Andreas Weiden basándose en el paquete AS_PDF3 desarrollado por Anton Scheffer
+ - Crear Listado de la Tabla Empleados en iReport Designer con y sin parámetros
+ - Desplegar el listado PDF desde una aplicación en APEX 5.0
+
+ HowTO
+ .Connect to SQLPLUS. SYS as SYSDBA
+   GRANT EXECUTE ON UTL_FILE TO GFE;
+ .Download from https://sourceforge.net/projects/pljrxml2pdf/?source=typ_redirect
+ .Connect to SQLPLUS. GFE as Normal
+  C:\> @install.sql
+    -> This will install the JRXML_% schema objects
+
+    @APEX > SQL Workshop> Object Browser
+
+ .@APEX > App Builder > Import
+   Import file: f114.sql
+   File type: Database Application, Page or Component Export
+   File Character Set: Unicode UTF-8
+
+.Download iReport http://community.jaspersoft.com/download
+  Download odbc -> http://www.oracle.com/technetwork/apps-tech/jdbc-112010-090769.html
+ 
+  -> iReport > Tools > Options/ClassPath 
+     add jrxml2pdf.jar
+     add ojdbc6.jar
+     Check jasperreports-core-renderer.jar
+
+  -> iReport > Window > Welcome to JasperReport iReport Designer
+     Step1. Create connection
+     Step2. Create Report
+       -> image .GIF/.JPG/.PNG (NO Alfa)
+
+      .Add XML to JRXML_REPORT_DEFINITIONS table.
+         -> SELECT * FROM jrxml_report_definitions FOR UPDATE;
+
+      .Add images to JRXML_REPORT_IMAGES table
+         -> SELECT * FROM jrxml_report_images FOR UPDATE;
+            .JRI_NAME: 'GSG.png'
+            .JRI_IMAGE: <BLOB>
+
+.@Apex
+Create Interactive Report
+  DECLARE
+    vcName VARCHAR2(200);
+    lParams GFE.PK_JRXML2PDF_REPGEN.TPARAMLIST;
+    bl BLOB;
+  BEGIN
+    vcName := 'EMPLEADOS';
+    bl := GFE.PK_JRXML2PDF_REPGEN.PR_SHOW_REPORT(b1);
+    APEX_APPLICATION.STOP_APEX_ENGINE;
+  END;
+
+iReport > listado-empleados > Styles > Row
+  jrxml2pdf.Wrappers.mod($V{REPORT_COUNT},2) == 0
+  --$V{REPORT_COUNT}%2 == 0
+
+DECLARE
+  CURSOR crReport IS
+    SELECT JRD_NAME
+      FROM JRXML_REPORT_DEFINITIONS
+     WHERE JRD_ID=:P6_JRD_ID;
+  CURSOR crParams IS
+    SELECT C001 NAME,
+           C002 VALUE
+      FROM APEX_COLLECTIONS
+     WHERE COLLECTION_NAME='PARAMETERS'
+       AND C001 IS NOT NULL;
+  vcName  VARCHAR2(200);
+  rParam  PK_JRXML2PDF_REPGEN.tParameter;
+  lParams PK_JRXML2PDF_REPGEN.tParamList;
+  bl BLOB;
+BEGIN
+  OPEN crReport;
+  FETCH crReport INTO vcName;
+  CLOSE crReport;
+  IF :P6_LOG=0 THEN
+    PK_JRXML2PDF_LOG.PR_SET_LEVEL(i_nLevel  =>PK_JRXML2PDF_LOG.LEVEL_NONE,
+                                  i_nLogMode=>PK_JRXML2PDF_LOG.LOGMODE_TABLE
+                                  );
+  ELSIF :P6_LOG=1 THEN
+    PK_JRXML2PDF_LOG.PR_SET_LEVEL(i_nLevel  =>PK_JRXML2PDF_LOG.LEVEL_OVERVIEW,
+                                  i_nLogMode=>PK_JRXML2PDF_LOG.LOGMODE_TABLE
+                       s           );
+  ELSIF :P6_LOG=2 THEN
+    PK_JRXML2PDF_LOG.PR_SET_LEVEL(i_nLevel  =>PK_JRXML2PDF_LOG.LEVEL_PROCESS,
+                                  i_nLogMode=>PK_JRXML2PDF_LOG.LOGMODE_TABLE
+                                  );
+  ELSIF :P6_LOG=3 THEN
+    PK_JRXML2PDF_LOG.PR_SET_LEVEL(i_nLevel  =>PK_JRXML2PDF_LOG.LEVEL_DETAIL,
+                                  i_nLogMode=>PK_JRXML2PDF_LOG.LOGMODE_TABLE
+                                  );
+  ELSIF :P6_LOG=4 THEN
+    PK_JRXML2PDF_LOG.PR_SET_LEVEL(i_nLevel  =>PK_JRXML2PDF_LOG.LEVEL_FINE,
+                                  i_nLogMode=>PK_JRXML2PDF_LOG.LOGMODE_TABLE
+                                  );
+  ELSIF :P6_LOG=5 THEN
+    PK_JRXML2PDF_LOG.PR_SET_LEVEL(i_nLevel  =>PK_JRXML2PDF_LOG.LEVEL_INTERNAL,
+                                  i_nLogMode=>PK_JRXML2PDF_LOG.LOGMODE_TABLE
+                                  );
+  END IF;
+
+  -- Add parameters to report, if any
+  FOR rec IN crParams LOOP
+    rParam.vcName:=rec.NAME;
+    rParam.vcValue:=rec.VALUE;
+    lParams(lParams.COUNT+1):=rParam;
+  END LOOP;
+
+  bl :=PK_JRXML2PDF_REPGEN.FK_RUN(i_vcName =>vcName,
+                                  i_lParams=>lParams);
+  COMMIT;
+  PK_JRXML2PDF_REPGEN.PR_SHOW_REPORT(bl);
+  APEX_APPLICATION.STOP_APEX_ENGINE;
+END;
+
+
+
+420*10 
